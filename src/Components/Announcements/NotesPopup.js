@@ -8,17 +8,27 @@ import TextField from '@mui/material/TextField';
 import CreateIcon from '@mui/icons-material/Create';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import Typography from '@mui/material/Typography';
+import LinearProgress from '@mui/material/LinearProgress';
+import getTimestamp from "../../Timestamp/timestamp";
 import { UploadFileOutlined } from '@mui/icons-material';
+import { ref } from "firebase/storage";
+import { storage } from "../../Firebase/Firebase";
+import { getDownloadURL, uploadBytesResumable } from 'firebase/storage';
+import {useParams} from 'react-router-dom';
+import {api} from '../../api';
 
 function Popup(props) {
     const { openPopup, setOpenPopup} = props;
+    const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
     const [link, setLink] = useState('');
     const [file, setFile] = useState(null);
     const [fileName, setFileName] = useState("No file chosen");
+    const [fileLink, setFileLink] = useState("-");
     const questionRef = useRef();
+    let { classId } = useParams();
 
     const handleTitleChange = (event) => {
         setTitle(event.target.value);
@@ -40,28 +50,81 @@ function Popup(props) {
             setFileName(event.target.files[0].name);
         }
     }
-    const handleSubmit = (e) => {
+    const uploadFile = (e) => {
         e.preventDefault()
-        setOpenPopup(false);
+        setLoading(true);
+        if(file){
+            const time = getTimestamp();
+            const NotesStorageRef = ref(storage, `Announcements/Notes/${fileName} - ${time}`);
+            const uploadTask = uploadBytesResumable(NotesStorageRef, file);
+
+            uploadTask.on('state_changed', (snapshot)=>{
+                console.log(snapshot);
+            },
+            (err) => console.log(err),
+            ()=>{
+                getDownloadURL(uploadTask.snapshot.ref).then(url=>
+                    {
+                        setFileLink(url);
+                        console.log(url)
+                        submitData(url);
+                    });
+
+            }
+            )
+
+        }
+    };
+
+    const submitData = (url)=>{
+        
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
-    
-        var raw = JSON.stringify({"title": title, "body":body, "link": link, "file": file});
-        console.log(raw);
+
+        var raw = JSON.stringify({"author":"author", "content": body, "title": title, "link": link, "timestamp": getTimestamp(), "imageUrl": url, "className": classId});
+
+        var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+        };
+        console.log(raw)
+        let status = 0;
+        fetch(api+"announcements/post/notes", requestOptions)
+        .then(response => {status=response.status; return response.json()})
+        .then(result =>{
         
+        // document.getElementById("progress").style.display="none"
+            console.log(result);
+            setLoading(false);
+            setOpenPopup(false);
+            setLink('');
+            setFile(null);
+            setFileName('No file chosen')
+            setTitle('');
+            setBody('');
+            if(status == 200){
+                alert("Your announcement has been successfully posted!")
+                window.location.reload();
+            }
+            else{
+            alert("An error occured. Please try again later");
+            window.location.reload();
+            }
+        })
+        .catch(error => console.log('error', error));
+
         
-        setLink('');
-        setFile(null);
-        setFileName('No file choses')
-        setTitle('');
-        setBody('');
-      };
+    }
+
     return (
-        <Dialog open={openPopup} fullWidth={true}>
+        <Dialog open={openPopup} fullWidth={true} sx={{mt:'10px'}}>
             <DialogTitle>
-                <div style={{display:'flex', alignItems:'center'}}><CreateIcon/>Create Post</div>
+                <div style={{display:'flex', alignItems:'center'}}><CreateIcon/>Add Notes</div>
             </DialogTitle>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={uploadFile}>
+            {loading?<LinearProgress/>:<span></span>}
             <DialogContent dividers>
                 <TextField
                 margin="dense"
@@ -71,7 +134,7 @@ function Popup(props) {
                 fullWidth
                 variant="outlined"
                 multiline={true}
-                rows={2}
+                rows={1}
                 value={title}
                 onChange={handleTitleChange}
             />
@@ -90,7 +153,6 @@ function Popup(props) {
                 margin="dense"
                 id="link"
                 label="Related Link"
-                required
                 fullWidth
                 variant="outlined"
                 value={link}
@@ -104,7 +166,7 @@ function Popup(props) {
                 >
                     Upload File
                     <input
-                        id="fileInput"
+                        id="imgInput"
                         type="file"
                         onChange={handleImageChange}
                         hidden

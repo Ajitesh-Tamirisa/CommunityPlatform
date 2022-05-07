@@ -11,20 +11,35 @@ import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Fade from '@mui/material/Fade';
 // import {Link} from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CommentIcon from '@mui/icons-material/Comment';
 
-export default function QuestionCard({author, timestamp, title, body, image, link, branchId, postId, forums, width}) {
+export default function QuestionCard({author, timestamp, title, body, image, link, branchId, postId, forums, width, mb, square, notesLink}) {
 
   const w = width ? width:{xs:'95%', sm:'67%'}
-
+  const m = mb ? mb : 1.5
   const style = {
     width: w,
-    m: 1.5
+    m: 1.5,
+    mb: mb
   }
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+
   return (
-    <Card sx={style}>
+    <Card sx={style} square={square}>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
@@ -32,9 +47,23 @@ export default function QuestionCard({author, timestamp, title, body, image, lin
           </Avatar>
         }
         action={
+          <div>
           <IconButton aria-label="settings">
-            <MoreVertIcon />
+            <MoreVertIcon onClick={handleClick}/>
           </IconButton>
+          <Menu
+            id="fade-menu"
+            MenuListProps={{
+              'aria-labelledby': 'fade-button',
+            }}
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            TransitionComponent={Fade}
+          >
+            <MenuItem onClick={handleClose}>Delete Post</MenuItem>
+          </Menu>
+          </div>
         }
         title={author}
         subheader={timestamp}
@@ -55,16 +84,22 @@ export default function QuestionCard({author, timestamp, title, body, image, lin
           <Stack direction="row" alignItems="center" justifyContent="center">
             <CommentIcon/>
             <Typography sx={{pl:0.5, pr:0.5, fontWeight:500}}>
-              View Replies
+              Replies
             </Typography>
           </Stack>
         </Link>:<span></span>}
       {link?<div style={{textAlign:'center'}}>
-              {/* <br/> */}
-              <Link sx={{pl:2.5, pr:2.5, textAlign:'center'}} href="#" underline="hover">
+              <br/>
+              <Link sx={{pl:2.5, pr:2.5, textAlign:'center'}} href={link} underline="hover">
                 {link}
               </Link>
           </div>: <span></span>}
+      {notesLink?<div style={{textAlign:'center'}}>
+          <br/>
+          <Link sx={{pl:2.5, pr:2.5, textAlign:'center'}} href={notesLink} underline="hover">
+            View notes here
+          </Link>
+      </div>: <span></span>}
       </CardContent>
       {image ?  <CardContent>
         <CardMedia

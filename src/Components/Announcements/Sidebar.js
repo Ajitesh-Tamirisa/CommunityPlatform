@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
@@ -16,7 +16,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CircleIcon from '@mui/icons-material/Circle';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import AppBar from '@mui/material/AppBar';
-import {  Link, useLocation } from 'react-router-dom';
+import Link from '@mui/material/Link';
+import { api } from "../../api";
+import { useLocation } from 'react-router-dom';
+import { LinearProgress } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const drawerWidth = 280;
 
@@ -30,7 +34,32 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 function Sidebar(props) {
-    const { window } = props;
+  const { window } = props;
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  async function getClasses(){
+    setLoading(true);
+    var requestOptions = {
+        method: 'GET',
+        redirect: 'follow'
+      };
+      
+      await fetch(api+"view_all/posts", requestOptions)
+        .then(response => response.json())
+        .then(res => {
+            console.log(res)
+            if(res.status==200){
+              setClasses(res.result)
+            }
+            else{
+                alert("Could not fetch data. Please try again later.")
+            }
+            setLoading(false);
+        })
+        .catch(error => console.log('error', error));
+        setLoading(false);
+  }
 
   const drawer = (
       <div>
@@ -53,30 +82,43 @@ function Sidebar(props) {
         </ListItemButton>
         <Divider sx={{m:0.5, p:0, height:'2px'}}/>
         <List component="div" disablePadding>
-            <ListItemButton sx={{ pl: 5 }}>
-                <ListItemIcon>
-                <CircleIcon sx={{fontSize: '10px', color: "#d32f2f"}} />
-                </ListItemIcon>
-                <ListItemText primary="All" component={Link} to="/Announcements/735" />
-            </ListItemButton>
+              {/* <div style={{display:'flex', justifyContent:'center'}}>
+                <CircularProgress sx={{width:'100%', fontSize:'10px'}} textAlign="center"/>
+              </div> */}
+              <Link sx={{color:'black'}} href="/Announcements/All" underline="none">
+                <ListItemButton sx={{ pl: 5 }}>
+                    <ListItemIcon>
+                    <CircleIcon sx={{fontSize: '10px', color: "#d32f2f"}} />
+                    </ListItemIcon>
+                      <ListItemText primary="All" />
+                </ListItemButton>
+              </Link>
             <Divider component="li" variant="inset" />
-            <ListItemButton sx={{ pl: 5 }}>
-                <ListItemIcon>
-                <CircleIcon sx={{fontSize: '10px', color: "#d32f2f"}} />
-                </ListItemIcon>
-                <ListItemText primary="CSE-A 2018-2022"  component={Link} to="/Announcements/735"/>
-            </ListItemButton>
+            <Link sx={{color:'black'}} href="/Announcements/CSE-A 2018-2022" underline="none">
+              <ListItemButton sx={{ pl: 5 }}>
+                  <ListItemIcon>
+                  <CircleIcon sx={{fontSize: '10px', color: "#d32f2f"}} />
+                  </ListItemIcon>
+                    <ListItemText primary="CSE-A 2018-2022"/>
+              </ListItemButton>
+            </Link>
             <Divider component="li" variant="inset" />
-            <ListItemButton sx={{ pl: 5 }}>
-                <ListItemIcon>
-                <CircleIcon sx={{fontSize: '10px', color: "#d32f2f"}} />
-                </ListItemIcon>
-                <ListItemText primary="CSE-B 2018-2022" component={Link} to="/Announcements/735" />
-            </ListItemButton>
+            <Link sx={{color:'black'}} href="/Announcements/CSE-B 2018-2022" underline="none">
+              <ListItemButton sx={{ pl: 5 }}>
+                  <ListItemIcon>
+                  <CircleIcon sx={{fontSize: '10px', color: "#d32f2f"}} />
+                  </ListItemIcon>
+                    <ListItemText primary="CSE-B 2018-2022"/>
+              </ListItemButton>
+            </Link>
         </List>
         </List>
       </div>
   )
+
+  useEffect(()=>{
+    // getClasses();
+  }, [])
 
   const container = window !== undefined ? () => window().document.body : undefined;
 

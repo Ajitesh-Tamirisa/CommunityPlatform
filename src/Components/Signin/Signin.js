@@ -64,9 +64,9 @@ function Signin() {
         // setLoading(false)
     }
 
-    const paperStyle = {padding:20, height: '70vh', width: '300px', margin: '30px auto'};
-    const buttonStyle = {margin:'28px 10px'};
-    const textfieldStyle = {margin: '30px 0'};
+    const paperStyle = {padding:10, height: '75%', width: '300px', margin: '20px auto'};
+    const buttonStyle = {margin:'20px 10px'};
+    const textfieldStyle = {margin: '15px 0'};
     const preventDefault = (event) => event.preventDefault();
     // if(currentUser){
     //     return <Redirect to="/DiscussionForums"></Redirect>

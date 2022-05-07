@@ -3,9 +3,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -17,34 +14,33 @@ import { api } from "../../api";
 function Popup(props) {
     const { openPopup, setOpenPopup} = props;
     // const [open, setOpen] = useState(false);
-    const [branch, setBranch] = useState('');
     const [title, setTitle] = useState('');
-    const [body, setBody] = useState('');
+    const [content, setContent] = useState('');
+    const [link, setLink] = useState('');
     const [loading, setLoading] = useState(false);
     // const branchRef = useRef(null);
     // const titleRef = useRef(null);
     // const bodyRef = useRef(null);
 
-    const handleBranchChange = (event) => {
-        setBranch(event.target.value);
+    const handleLinkChange = (event) => {
+        setLink(event.target.value);
     };
     const handleTitleChange = (event) => {
         setTitle(event.target.value);
     };
-    const handleBodyChange = (event) => {
-        setBody(event.target.value);
+    const handleContentChange = (event) => {
+        setContent(event.target.value);
     };
     const handleClose = () => {
         setOpenPopup(false);
     };
-
     const handleSubmit = (e) => {
         e.preventDefault()
         setLoading(true);
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
     
-        var raw = JSON.stringify({"author":"Author", "branch": branch, "title": title, "body":body, "timestamp": getTimestamp()});
+        var raw = JSON.stringify({"author":"Author", "title": title, "content":content, "link": link, "timestamp": getTimestamp()});
         console.log(raw);
         
         var requestOptions = {
@@ -53,63 +49,44 @@ function Popup(props) {
             body: raw,
             redirect: 'follow'
           };
+        console.log(raw);
         let status = 0;
-        fetch(api+"discussion-forum/ask", requestOptions)
+        fetch(api+"opportunities/post", requestOptions)
         .then(response => {
             status = response.status; 
+            console.log(status); 
             return response.json();
-        })
+          })
         .then(result =>{
             console.log(result);
-            if(status==200){
-                alert("Your question has been successfully posted!")
+            setOpenPopup(false);
+            setLoading(false);
+            if(status == 200){
+                alert("Posted successfully!")
+                window.location.reload()
             }
             else{
-                alert("Your question could not be posted. Please try again later.")
+                alert("Could not fetch data. Please try again later.")
             }
-            setLoading(false);
-            setBranch('');
+            
             setTitle('');
-            setBody('');
-            setOpenPopup(false);
-            window.location.reload()
-        })
-        .catch(error => console.log('error', error));
+            setContent('');
+            setLink('');
+          })
+          .catch(error => console.log('error', error));
         
         
       };
     return (
         <Dialog open={openPopup} fullWidth={true}>
-            {loading?<Box sx={{ width: '100%' }}>
+            {loading && <Box sx={{ width: '100%' }}>
                 <LinearProgress />
-            </Box>:<span></span>}
+            </Box>}
             <DialogTitle>
                 <div>Create Post</div>
             </DialogTitle>
             <form onSubmit={handleSubmit}>
             <DialogContent dividers>
-                <FormControl
-                    sx={{  width: '100%', zIndex:'10000' }} required>
-                <InputLabel id="demo-simple-select-required-label">Branch</InputLabel>
-                <Select
-                labelId="demo-simple-select-required-label"
-                id="demo-simple-select-required"
-                value={branch}
-                variant="outlined"
-                // inputRef={branchRef}
-                fullWidth
-                onChange={handleBranchChange}
-
-                >
-                    <MenuItem value={"General"}>General</MenuItem>
-                    <MenuItem value={"CIVIL"}>Civil</MenuItem>
-                    <MenuItem value={"CSE"}>CSE</MenuItem>
-                    <MenuItem value={"EEE"}>EEE</MenuItem>
-                    <MenuItem value={"ECE"}>ECE</MenuItem>            
-                    <MenuItem value={"MECH"}>Mechanical</MenuItem>
-                    <MenuItem value={"IT"}>IT</MenuItem>
-                </Select>
-                </FormControl>
             <FormControl sx={{  width: '100%' }} required>
                 <TextField
                 margin="dense"
@@ -128,15 +105,31 @@ function Popup(props) {
             <FormControl sx={{  width: '100%' }} required>
                 <TextField
                 margin="dense"
-                id="body"
-                label="Body (optional)"
+                id="content"
+                label="Content"
+                required
                 fullWidth
                 variant="outlined"
                 // inputRef={bodyRef}
-                value={body}
+                value={content}
                 multiline={true}
                 rows={6}
-                onChange={handleBodyChange}
+                onChange={handleContentChange}
+                />
+            </FormControl>
+            <FormControl sx={{  width: '100%' }} required>
+                <TextField
+                margin="dense"
+                id="link"
+                label="Link"
+                required
+                fullWidth
+                variant="outlined"
+                // inputRef={bodyRef}
+                value={link}
+                multiline={true}
+                rows={1}
+                onChange={handleLinkChange}
                 />
             </FormControl>
             </DialogContent>

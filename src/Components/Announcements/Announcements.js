@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import Sidebar from "./Sidebar";
 import PropTypes from 'prop-types';
 import CreateCard from "../Card/CreateCard";
@@ -9,12 +9,14 @@ import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import {useParams} from 'react-router-dom';
-import AnnPopup from './AnnPopup';
+import PostPopup from './PostPopup';
+import NotesPopup from './NotesPopup';
+import LinearProgress from '@mui/material/LinearProgress';
 import "./Announcements.css";
 import { makeStyles} from '@mui/styles';
 import image from "../../Images/Time Table.png";
 import image2 from "../../Images/NAAC A+.jpeg";
-
+import {api} from "../../api";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -45,9 +47,18 @@ function a11yProps(index) {
 
 export default function Announcements() {
   
-  const [openPopup, setOpenPopup] = useState(false);
+  const [openPostPopup, setOpenPostPopup] = useState(false);
+  const [openFormsPopup, setOpenFormsPopup] = useState(false);
+  const [openNotesPopup, setOpenNotesPopup] = useState(false);
+  const [postsLoading, setPostsLoading] = useState(false);
+  const [formsLoading, setFormsLoading] = useState(false);
+  const [notesLoading, setNotesLoading] = useState(false);
   const [value, setValue] = React.useState(0);
-  let { groupId } = useParams();
+  const [posts, setPosts] = useState([]);
+  const [forms, setForms] = useState([]);
+  const [notes, setNotes] = useState([]);
+  let { classId } = useParams();
+  // console.log(classId);
   const keys = {
     "All": "All",
     "18":"CSE-A 2018-2022",
@@ -71,7 +82,8 @@ export default function Announcements() {
       "& .MuiTab-root.Mui-selected": {
         fontWeight:'600',
         color: '#14274E'
-      }
+      },
+      
     }
   })
   const classes = useStyles();
@@ -80,7 +92,76 @@ export default function Announcements() {
     setValue(newValue);
   };
 
-  let posts = {
+  async function getPosts(){
+    setPostsLoading(true);
+    var requestOptions = {
+        method: 'GET',
+        redirect: 'follow'
+      };
+      let status = 0;
+      await fetch(api+"announcements/view_all/posts/"+classId, requestOptions)
+        .then(response => {status = response.status; return response.json()})
+        .then(res => {
+            console.log(res)
+            if(status==200){
+              setPosts(res);
+            }
+            else{
+                alert("Could not fetch data. Please try again later.")
+            }
+            setPostsLoading(false);
+        })
+        .catch(error => console.log('error', error));
+  }
+
+  
+  async function getNotes(){
+    setNotesLoading(true);
+    var requestOptions = {
+        method: 'GET',
+        redirect: 'follow'
+      };
+      
+      let status = 0;
+      await fetch(api+"announcements/view_all/notes/"+classId, requestOptions)
+        .then(response => {status = response.status; return response.json()})
+        .then(res => {
+            console.log(res)
+            if(status==200){
+              setNotes(res)
+            }
+            else{
+              alert("Could not fetch data. Please try again later.")
+            }
+            setNotesLoading(false);
+        })
+        .catch(error => console.log('error', error));
+  }
+
+  async function getForms(){
+    setFormsLoading(true);
+    var requestOptions = {
+        method: 'GET',
+        redirect: 'follow'
+      };
+      
+      await fetch(api+"view_all/forms/"+classId, requestOptions)
+        .then(response => response.json())
+        .then(res => {
+            console.log(res)
+            if(res.status==200){
+              setForms(res.result)
+            }
+            else{
+                alert("Could not fetch data. Please try again later.")
+            }
+            setFormsLoading(false);
+        })
+        .catch(error => console.log('error', error));
+  }
+
+
+  let postsArr = {
     post1: {
       "author": "Sollicitudin",
       "timestamp": "Friday, 28th January 2022",
@@ -114,64 +195,80 @@ export default function Announcements() {
       "image": image
     }
   }
+  useEffect(() => {
+    getPosts();
+    getNotes();
+    // getForms();
+    // setPosts(postsArr);
+  }, [])
 
   return (
     <div>
     <div className="ann_general">
         <Sidebar/>        
-        <div class="ann_general__right" style={{marginTop: '65px'}}>
+        <div class="ann_general__right ann_general__right_ext" style={{marginTop: '65px'}}>
           <div style={{backgroundColor: 'white', width: '100%', textAlign: 'center'}}>
             <Typography sx={{ fontWeight: 600, fontSize: 24, m: 1.5 }}>All</Typography>
           </div>
           <Box sx={{ width: '100%' }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Box sx={{ borderBottom: 1, borderTop:1, borderColor: 'divider' }}>
               <AppBar elevation={1} position="static" sx={{bgcolor: "#F1F6F9"}}>
                 <Tabs className={classes.tabs} variant="fullWidth" value={value} onChange={handleChange} aria-label="basic tabs example">
                   <Tab label="Posts" {...a11yProps(0)} />
-                  <Tab label="Forms" {...a11yProps(1)} />
-                  <Tab label="Notes" {...a11yProps(2)} />
+                  <Tab label="Notes" {...a11yProps(1)} />
+                  <Tab label="Forms" {...a11yProps(2)} />
                 </Tabs>
               </AppBar>
             </Box>
 
             <TabPanel value={value} index={0}>
-              <CreateCard heading="Create Post" plholder="What do you want to ask or share?" openPopup={openPopup} setOpenPopup={setOpenPopup} />                    
-              {Object.keys(posts).map((post)=>(
-                  <Card key={post} author={posts[post].author} timestamp={posts[post].timestamp} title={posts[post].title} body={posts[post].body} link={posts[post].link} image={posts[post].image} forums={false} />
-              ))}
+              {postsLoading ? <LinearProgress sx={{width:'100%', mt:'1px'}}/> : <CreateCard heading="Create Post" plholder="What do you want to ask or share?" openPopup={openPostPopup} setOpenPopup={setOpenPostPopup} />}
+              {!postsLoading && Object.keys(posts).reverse().map((post)=>(
+                  <Card key={post} author={posts[post].author} timestamp={posts[post].timestamp} title={posts[post].title} body={posts[post].content} link={posts[post].link} image={posts[post].imageUrl} forums={false} />
+              ))} 
+              {(posts.length<1 && !postsLoading) && <h5>No posts to display now</h5>}             
               {/* <Card type="announcement" author="Lizard" timestamp="Friday, 28th January 2022" title="How to pass this exam?"/> */}
+              {/* <Card author="Lizard" timestamp="Friday, 28th January 2022" title="How to pass this exam?"/>
               <Card author="Lizard" timestamp="Friday, 28th January 2022" title="How to pass this exam?"/>
               <Card author="Lizard" timestamp="Friday, 28th January 2022" title="How to pass this exam?"/>
               <Card author="Lizard" timestamp="Friday, 28th January 2022" title="How to pass this exam?"/>
               <Card author="Lizard" timestamp="Friday, 28th January 2022" title="How to pass this exam?"/>
-              <Card author="Lizard" timestamp="Friday, 28th January 2022" title="How to pass this exam?"/>
-              <Card author="Lizard" timestamp="Friday, 28th January 2022" title="How to pass this exam?"/>
+              <Card author="Lizard" timestamp="Friday, 28th January 2022" title="How to pass this exam?"/> */}
             </TabPanel>
             <TabPanel value={value} index={1}>
-              <CreateCard heading="Create Form" plholder="What do you want to ask or share?" openPopup={openPopup} setOpenPopup={setOpenPopup} />                    
-              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>              
+              {notesLoading ? <LinearProgress sx={{width:'100%'}}/> : <CreateCard heading="Add Notes" plholder="What do you want to ask or share?" openPopup={openNotesPopup} setOpenPopup={setOpenNotesPopup} />}
+              {!notesLoading && Object.keys(notes).reverse().map((post)=>(
+                  <Card key={post} author={notes[post].author} timestamp={notes[post].timestamp} title={notes[post].title} body={notes[post].body} link={notes[post].link} notesLink={notes[post].imageUrl} forums={false} />
+              ))} 
+              {(notes.length<1 && !notesLoading) && <h5>No posts to display now</h5>}      
+              {/* <CreateCard heading="Add Notes" plholder="What do you want to ask or share?" openPopup={openNotesPopup} setOpenPopup={setOpenNotesPopup} />                    
+              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/> */}
             </TabPanel>
             <TabPanel value={value} index={2}>
-              <CreateCard heading="Add Notes" plholder="What do you want to ask or share?" openPopup={openPopup} setOpenPopup={setOpenPopup} />                    
-              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>                    
-              <Card author="Lizard" timestamp="Friday, 29th January 2022" title="How to pass this exam?"/>
+              {formsLoading ? <LinearProgress sx={{width:'100%'}}/> : <CreateCard heading="Create Form" plholder="What do you want to ask or share?" openPopup={openNotesPopup} setOpenPopup={setOpenNotesPopup} />}
+              {!formsLoading && Object.keys(posts).map((post)=>(
+                  <Card key={post} author={posts[post].author} timestamp={posts[post].timestamp} title={posts[post].title} body={posts[post].body} link={posts[post].link} image={posts[post].image} forums={false} />
+              ))}              
+              {/* <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>                    
+              <Card author="Lizard" timestamp="Friday, 27th January 2022" title="How to pass this exam?"/>               */}
             </TabPanel>
           </Box>
         </div>
     </div>
     
-    <AnnPopup openPopup = {openPopup} setOpenPopup = {setOpenPopup}/>
+    <PostPopup openPopup = {openPostPopup} setOpenPopup = {setOpenPostPopup}/>
+    <NotesPopup openPopup = {openNotesPopup} setOpenPopup = {setOpenNotesPopup}/>
     </div>
   )
 }

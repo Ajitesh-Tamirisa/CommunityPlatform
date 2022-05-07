@@ -22,9 +22,12 @@
     width: 100%;
     height: auto;
     display: flex;
-    justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+.general__right_ext{
+    padding-bottom:55px;
+    min-height: 90vh;
 }
 .general_right_cover{
     background: #200122;  /* fallback for old browsers */

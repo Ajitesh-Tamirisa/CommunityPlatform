@@ -90,23 +90,23 @@ function Signup({userType}) {
         // setLoading(false)
     }
 
-    const paperStyle = {padding:'1', height: '74vh', width: '300px', margin: 'auto'};
-    const buttonStyle = {margin:'20px 10px'};
-    const textfieldStyle = {margin: '15px 0'};
+    const paperStyle = {padding: 1, height: '74vh', width: '300px', margin: 'auto'};
+    const buttonStyle = {margin:'8px'};
+    const textfieldStyle = {margin: '10px 0'};
     const preventDefault = (event) => event.preventDefault();
     const classes = useStyles();
     return (
-        <div className='signupDiv'>
+        <div className='signupDivMain'>
             
-        {userType==1 ?<h2 style={{fontSize:"2rem", margin:"5px"}}><i className='fa fa-graduation-cap Navbar__logo'></i> Community Platform</h2>: <h2 style={{fontSize:"2rem", margin:"5px"}}><i className='fa fa-graduation-cap Navbar__logo'></i> Community Platform</h2> /*<AdminNavbar/>*/}
+        {/* {userType==1 ?<h2 style={{fontSize:"2rem", margin:"5px"}}><i className='fa fa-graduation-cap Navbar__logo'></i> Community Platform</h2>: <span></span>} */}
         <div style={{display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", margin:"4+px"}}>
-        <div className="box" style={{display:"flex", alignItems:"center", justifyContent:"space-around", width:"80%", padding:"18px", boxShadow:" rgba(0, 0, 0, 0.15) 0px 5px 15px 0px", borderRadius: "12px" }}>
+        <div className="box" style={{display:"flex", alignItems:"center", justifyContent:"space-around", width:"70%", padding:"5px", paddingTop:'0px', boxShadow:" rgba(0, 0, 0, 0.15) 0px 5px 15px 0px", borderRadius: "12px" }}>
             <div className="signupDiv">
             <Grid textAlign='center'>
             
                 <Paper className="paper" elevation={2} square={false} border-radius={100} style={paperStyle}>
                     {/* <h2><i className='fa fa-graduation-cap'></i> Community Platform</h2> */}
-                    {userType==1 ?<h1>Student Sign Up</h1>: <h1><i className="fas fa-chalkboard-teacher"></i>Add Faculty</h1>}
+                    {userType==1 ?<h1 style={{paddingBottom: '0px', marginBottom: '0px'}}>Student Sign Up</h1>: <h1><i className="fas fa-chalkboard-teacher"></i>Add Faculty</h1>}
                     {error && <Alert severity="error">{error}</Alert>}
                     {success && <Alert severity="success">{success}</Alert>}
                     <form onSubmit={handleSubmit}>
@@ -119,7 +119,7 @@ function Signup({userType}) {
                         </div>
                         <Button disabled={loading} style={buttonStyle} variant="contained" type="submit" color="secondary">Sign Up</Button>
                     </form>
-                    {userType==1 ? <Typography>
+                    {userType==1 ? <Typography sx={{pt:0}}>
                         Already have an account?<span> </span>
                         <Link to="/Signin">Sign In</Link>
                     </Typography>: <br></br>}

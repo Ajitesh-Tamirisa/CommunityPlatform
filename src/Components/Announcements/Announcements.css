@@ -24,9 +24,12 @@
     width: 100%;
     height: auto;
     display: flex;
-    justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+.ann_general__right_ext{
+    padding-bottom:55px;
+    min-height: 90vh;
 }
 .tabpanel{
     width: 100% !important;
