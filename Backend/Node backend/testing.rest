@@ -1,0 +1,176 @@
+GET http://localhost:8000/users/db/
+###
+GET http://localhost:3000/users/db/613c8f9e6bced848e5466cc2 
+
+###
+GET http://localhost:3000/announcements/view_all/posts/All
+
+###
+POST http://localhost:8000/announcements/post
+Content-Type: application/json
+
+{
+    //"title": "title",
+    "className": "MECH",
+    "author": "author",
+    "timestamp": "timestamp",
+    "content": "content",
+    "imageUrl": "imageUrl",
+    "link": "link"
+}
+
+###
+POST http://localhost:3000/discussion-forum/view_all 
+Content-Type: application/json
+
+{
+    "branchId" : "General"
+}
+
+###
+POST http://localhost:3000/discussion-forum/ques_data
+Content-Type: application/json
+
+{
+    "qid" : "62810d7917cc233f187e7891"
+}      
+
+###
+POST http://localhost:3000/discussion-forum/ask
+Content-Type: application/json
+
+{
+    "title": "How to become a Data Scientist ?",
+    "body" : "I want to get a job as a Data Scientist. Please let me know how to prepare for it.",
+    "branch" : "CSE",
+    "author": "cse187330045@matrusri.edu.in",
+    "timestamp": "15May 2021, 08:26:52 PM"
+}
+
+
+###
+POST http://localhost:3000/discussion-forum/post_reply/new
+Content-Type: application/json
+
+{
+    "qid": "62810d7917cc233f187e7891",
+    "author": "cse18733007@matrusri.edu.in",
+    "timestamp": "15 May 2022, 5:15:51 PM",
+    "reply": "You can follow the Data Scientist course on Udemy"
+}
+
+###
+POST http://localhost:8000/discussion-forum/delete_question
+Content-Type: application/json
+
+{
+    "qid" : "6278bf190a9606e9fcc430ff"
+}
+
+###
+POST http://localhost:3000/discussion-forum/delete_reply
+Content-Type: application/json
+
+{
+    "qid" : "62810d7917cc233f187e7891",
+    "replyId" : "undefined"
+}
+
+###
+GET http://localhost:3000/discussion-forum/flaggedPosts
+
+###
+POST http://localhost:3000/discussion-forum/flag_question
+Content-Type: application/json
+
+{
+    "qid" : "62810d7917cc233f187e7891"
+}
+
+###
+POST http://localhost:3000/discussion-forum/flag_reply
+Content-Type: application/json
+
+{
+    "qid": "62810d7917cc233f187e7891",
+    "replyId": "62810d7917cc233f187e7891/cse18733007/15 May 2022, 5:15:51 PM"
+}
+
+###
+GET http://localhost:3000/opportunities/view_all
+
+###
+POST http://localhost:3000/opportunities/post
+Content-Type: application/json
+
+{
+    "title": "Robotics Trainer - Ashtrix Robotics And Research Centre",
+    "content": "Ashtrix is an unconditional venture started to bridge the gap that exists between the obsolete and transient educational system and the change ridden industry standards. Constantly irked by the scares imposed by IT giants and public sectors, people at Ashtrix, have taken the front foot to provide a comprehensive and highly relevant training encompassing all realms of an engineering graduate's worry such as aptitude tests, entry-level technical skills, and soft skills.\n\nWe tend to be spendthrift when it comes to spending our wealth of wisdom. To educate as a service is our intention. We give our best and rest in reaching all corners of the nation to train students and deliver to them the latest trends in technology. Hence, state boundaries are no bounds. We and our services are simply ubiquitous!",
+    "author": "srinivasvasu348@gmail.com",
+    "timestamp": "23 Feb 2021, 11:36:28 PM",
+    "link": "https://internshala.com/internship/detail/robotics-trainer-internship-in-chennai-at-ashtrix-robotics-and-research-centre1613910827"
+
+}
+
+###
+GET http://localhost:3000/opportunities/opp_data
+Content-Type: application/json
+
+{
+    "oppId" : "626149297d4218076705ac78"
+}
+
+
+###
+GET http://localhost:3000/auth/getUsers
+
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFwcGFyYW9AZW1haWwuY29tIiwiaWF0IjoxNjUyMDI3NTIyLCJleHAiOjE2NTIxMTM5MjJ9.gW_7eMPbjea2y3gqYnQ_V6vVgkjVmykqK9WGfFd0NVg
+
+###
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+    "email" : "cse18733005@matrusri.edu.in",
+    "pwd" : "abcd",
+    //"lastLogin" : "lassssst Loggggginnnn - 1",
+    //"refToken" : "reffff tokkennnn - 1",
+    "validGroups" : [ "GENERAL" , "CSE" ]
+}
+
+###
+
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email" : "cse18733005@matrusri.edu.in",
+    "pwd" : "Sreekar"
+}
+
+###
+POST http://localhost:3000/auth/test
+Content-Type: application/json
+
+{
+    "refreshToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFwcGFyYW9AZW1haWwuY29tIiwiaWF0IjoxNjUyMDEwMzkyfQ.vXq03iw1jVVVkJJP2qhZDA9p9MeSzU-3nkwEUmns2y0"
+}
+
+###
+DELETE http://localhost:3000/auth/logout
+Content-Type: application/json
+
+{
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJhbUBlbWFpbC5jb20iLCJpYXQiOjE2NDQzMTM5NTV9.WmJbmymMgnbE5AE4Wggcz_eVgo9tUkTYeogt7rR1VGo"
+}
+
+###
+POST http://localhost:3000/auth/addRefToken
+Content-Type: application/json
+
+{
+    "token" : "hello Token - 3"
+}
+
+###
+GET http://localhost:3000/auth/getRefTokens
