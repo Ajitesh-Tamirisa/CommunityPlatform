@@ -1,5 +1,6 @@
 # Community Platform
 Community Platform is a full stack web application.Its main objective is to provide a single platform for communication between students and faculty, students and administration, students and alumni, and also among students. 
+Implemented a decision tree classifier to classify posts in discussion forums as hateful, offensive, and normal ensuring that the content on the website is clean and moderated.
 
 * Community Platform eliminates the need for various social media platforms by providing a single platform which allows students, faculty and administration to interact with each other.​
 
