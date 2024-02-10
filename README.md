@@ -4,7 +4,7 @@ A full-stack web application that provides a platform for communication between 
 Implemented a decision tree classifier to classify posts in discussion forums as hateful, offensive, and normal ensuring that the content on the website is clean and moderated.\
 \
 Tech stack - MongoDB, Express.js, ReactJS, Node.js, Python(Flask, Scikit-learn)\
-\
+
 * Community Platform eliminates the need for various social media platforms by providing a single platform which allows students, faculty and administration to interact with each other.​
 
 * Students can view all college related announcements and circulars. 
